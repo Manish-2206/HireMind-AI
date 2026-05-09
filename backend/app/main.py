@@ -38,10 +38,21 @@ app.mount(
     name="uploads"
 )
 
-# Load AI model
-model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
+# Lazy-loaded AI model
+model = None
+
+
+def get_model():
+
+    global model
+
+    if model is None:
+
+        model = SentenceTransformer(
+            "all-MiniLM-L6-v2"
+        )
+
+    return model
 
 
 @app.get("/")
@@ -154,7 +165,7 @@ async def rank_resumes(
         }
 
     # JD embedding
-    jd_embedding = model.encode(
+    jd_embedding = get_model().encode(
         [" ".join(jd_skills)]
     )
 
@@ -195,7 +206,7 @@ async def rank_resumes(
             continue
 
         # Resume embedding
-        resume_embedding = model.encode(
+        resume_embedding = get_model().encode(
             [" ".join(resume_skills)]
         )
 
@@ -264,7 +275,7 @@ async def rank_resumes(
             file.filename,
 
             "resume_url":
-            f"http://127.0.0.1:8000/uploads/{file.filename}"
+            f"https://hiremind-ai-backend-gn8t.onrender.com/uploads/{file.filename}"
         })
 
     # Sort results
