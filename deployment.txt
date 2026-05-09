@@ -1,0 +1,12 @@
+description example  :
+Looking for a Python developer with React, SQL, Docker and Git experience.
+-------------------------------------------------------------------------
+for backend :
+venv\Scripts\activate
+uvicorn app.main:app --reload
+--------------------------------------------------------------------------
+for frontend :
+npm run dev
+--------------------------------------------------------------------------
+in browser :
+http://localhost:5173
