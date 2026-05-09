@@ -53,7 +53,10 @@ function App() {
 
       const response = await axios.post(
         "https://hiremind-ai-backend-gn8t.onrender.com/rank-resumes/",
-        formData
+        formData,
+        {
+          timeout: 120000
+        }
       )
 
       setResults(
