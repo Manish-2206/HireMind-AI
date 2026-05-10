@@ -8,7 +8,7 @@ import pdfplumber
 
 from app.skills import SKILLS
 
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
@@ -37,22 +37,6 @@ app.mount(
     StaticFiles(directory="uploads"),
     name="uploads"
 )
-
-# Lazy-loaded AI model
-model = None
-
-
-def get_model():
-
-    global model
-
-    if model is None:
-
-        model = SentenceTransformer(
-            "all-MiniLM-L6-v2"
-        )
-
-    return model
 
 
 @app.get("/")
@@ -164,11 +148,6 @@ async def rank_resumes(
             "No valid skills found in job description"
         }
 
-    # JD embedding
-    jd_embedding = get_model().encode(
-        [" ".join(jd_skills)]
-    )
-
     for file in files:
 
         # Save resume
@@ -205,15 +184,25 @@ async def rank_resumes(
         if len(resume_skills) == 0:
             continue
 
-        # Resume embedding
-        resume_embedding = get_model().encode(
-            [" ".join(resume_skills)]
+        # TF-IDF similarity
+        documents = [
+
+            " ".join(jd_skills),
+
+            " ".join(resume_skills)
+        ]
+
+        vectorizer = TfidfVectorizer()
+
+        tfidf_matrix = vectorizer.fit_transform(
+            documents
         )
 
-        # Similarity score
         similarity_score = cosine_similarity(
-            resume_embedding,
-            jd_embedding
+
+            tfidf_matrix[0:1],
+            tfidf_matrix[1:2]
+
         )[0][0]
 
         semantic_match_percentage = round(
