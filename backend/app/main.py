@@ -205,8 +205,22 @@ async def rank_resumes(
 
         )[0][0]
 
+        base_score = float(similarity_score) * 100
+
+        skill_match_bonus = (
+            len(matched_skills)
+            /
+            len(jd_skills)
+        ) * 100
+
+        final_score = (
+            base_score * 0.4
+            +
+            skill_match_bonus * 0.6
+        )
+
         semantic_match_percentage = round(
-            float(similarity_score) * 100,
+            min(final_score, 100),
             2
         )
 
